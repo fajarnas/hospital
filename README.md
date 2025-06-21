@@ -10,8 +10,6 @@ Ini adalah halaman landing berbasis web yang dirancang untuk rumah sakit, klinik
 - 🏆 Bagian showcase layanan
 - 👩‍⚕️ Profil dokter/staf
 - ✉️ Formulir kontak
-- 🗺️ Integrasi peta lokasi
-- 💬 Testimoni dan galeri (jika diperlukan)
 
 ## Memulai
 
