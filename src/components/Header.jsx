@@ -1,11 +1,15 @@
 import { Link } from "react-router-dom";
 import logo from "../assets/logo rs.png";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  // Tambahkan ref untuk menu dan tombol hamburger
+  const menuRef = useRef(null);
+  const hamburgerRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -14,6 +18,23 @@ const Header = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Tutup menu jika klik di luar menu/hamburger
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const handleClickOutside = (event) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target) &&
+        hamburgerRef.current &&
+        !hamburgerRef.current.contains(event.target)
+      ) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isMenuOpen]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -55,7 +76,7 @@ const Header = () => {
         {/* Tombol pencarian untuk desktop */}
         <div className="hidden md:block ml-4">
           <button
-            className="text-gray-600 hover:text-blue-600 focus:outline-none"
+            className="text-gray-600  focus:outline-none"
             onClick={() => setShowSearch(!showSearch)}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -66,7 +87,7 @@ const Header = () => {
         <div className="md:hidden flex items-center gap-2">
           {/* Tombol pencarian untuk mobile */}
           <button
-            className="text-gray-600 hover:text-blue-600 focus:outline-none"
+            className="text-gray-600 focus:outline-none"
             onClick={() => setShowSearch(!showSearch)}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -75,23 +96,33 @@ const Header = () => {
           </button>
           {/* Tombol hamburger untuk mobile navigation */}
           <button
+            ref={hamburgerRef}
             className="text-gray-600 focus:outline-none"
             onClick={toggleMenu}
+            aria-label={isMenuOpen ? "Tutup menu" : "Buka menu"}
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16m-7 6h7"
-              />
-            </svg>
+            {isMenuOpen ? (
+              // Icon X (close)
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              // Icon hamburger
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16m-7 6h7"
+                />
+              </svg>
+            )}
           </button>
         </div>
       </nav>
@@ -108,7 +139,10 @@ const Header = () => {
       )}
       {/* Menu navigasi untuk mobile */}
       {isMenuOpen && (
-        <ul className="text-absolute md:hidden flex flex-col space-y-4 bg-white shadow-md p-4">
+        <ul
+          ref={menuRef}
+          className="text-absolute md:hidden flex flex-col space-y-4 bg-white shadow-md p-4 "
+        >
           <li>
             <Link
               to="/"
